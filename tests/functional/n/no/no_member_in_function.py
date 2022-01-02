@@ -7,9 +7,9 @@ class Class:
     """Empty class"""
 
 
-def my_function(cla: Class) -> None:
-    cla.shouldFail()  # [no-member]
+def my_function(arg: Class) -> None:
+    arg.shouldFail()  # [no-member]
 
 
-cla = Class()
-cla.shouldFail()  # [no-member]
+obj = Class()
+obj.shouldFail()  # [no-member]

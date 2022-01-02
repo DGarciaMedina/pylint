@@ -11,5 +11,5 @@ def my_function(cla: Class) -> None:
     cla.shouldFail()  # [no-member]
 
 
-cl = Class()
-cl.shouldFail()  # [no-member]
+cla = Class()
+cla.shouldFail()  # [no-member]

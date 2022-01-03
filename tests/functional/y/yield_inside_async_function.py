@@ -1,5 +1,5 @@
 """Test that `yield` or `yield from` can't be used inside an async function."""
-# pylint: disable=missing-docstring, unused-variable
+# pylint: disable=missing-docstring, unused-variable, unused-private-function
 
 async def good():
     def _inner():

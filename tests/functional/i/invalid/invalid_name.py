@@ -1,6 +1,6 @@
 """ Tests for invalid-name checker. """
 # pylint: disable=unused-import, wrong-import-position, import-outside-toplevel, missing-class-docstring,missing-function-docstring
-# pylint: disable=too-few-public-methods
+# pylint: disable=too-few-public-methods, unused-private-function
 
 
 AAA = 24

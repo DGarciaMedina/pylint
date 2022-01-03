@@ -1,5 +1,5 @@
 # [missing-module-docstring]
-# pylint: disable=too-few-public-methods
+# pylint: disable=too-few-public-methods, unused-private-function
 
 
 class ClassDocumented:

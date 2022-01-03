@@ -86,6 +86,8 @@ from pylint.checkers.utils import (
     is_overload_stub,
     is_property_deleter,
     is_property_setter,
+    is_attr_protected,
+    is_attr_private
 )
 from pylint.reporters.ureports import nodes as reporter_nodes
 from pylint.utils import LinterStats
@@ -570,11 +572,24 @@ class BasicErrorChecker(_BasicChecker):
             "which results in an error since Python 3.6.",
             {"minversion": (3, 6)},
         ),
+        "W0119": (
+            "Private/protected function `%s` not used anywhere inside module",
+            "unused-private-function",
+            "Private functions should only be used inside the same module "
+            "and no use was detected."
+        ),
+        "W0130": (
+            "Private/protected class `%s` not used anywhere inside module",
+            "unused-private-class",
+            "Private classes should only be used inside the same module "
+            "and no use was detected."
+        ),
     }
 
-    @utils.check_messages("function-redefined")
+    @utils.check_messages("function-redefined", "unused-private-class")
     def visit_classdef(self, node: nodes.ClassDef) -> None:
         self._check_redefinition("class", node)
+        self._check_private_class_used(node)
 
     def _too_many_starred_for_tuple(self, assign_tuple):
         starred_count = 0
@@ -624,6 +639,7 @@ class BasicErrorChecker(_BasicChecker):
         "duplicate-argument-name",
         "nonlocal-and-global",
         "used-prior-global-declaration",
+        "unused-private-function"
     )
     def visit_functiondef(self, node: nodes.FunctionDef) -> None:
         self._check_nonlocal_and_global(node)
@@ -661,6 +677,9 @@ class BasicErrorChecker(_BasicChecker):
                         node=argument,
                         args=(argument.name,),
                     )
+
+        # Check if private function is ever used inside module
+        self._check_private_function_used(node)
 
     visit_asyncfunctiondef = visit_functiondef
 
@@ -936,6 +955,39 @@ class BasicErrorChecker(_BasicChecker):
                 "function-redefined",
                 node=node,
                 args=(redeftype, defined_self.fromlineno),
+            )
+
+    def _check_private_function_used(self, node: nodes.FunctionDef):
+        """ Check if a function is private or protected and is not used
+            in the parent's scope. Class methods don't are ignored.
+        """
+        parent_scope = node.parent.scope()
+        references = [
+            name_obj for name_obj in parent_scope.nodes_of_class(astroid.Name) if name_obj.name == node.name
+        ]
+        if (is_attr_private(node.name) or is_attr_protected(node.name)) and not references and not node.is_method():
+            self.add_message(
+                "unused-private-function",
+                node=node,
+                args=(node.name)
+            )
+
+    def _check_private_class_used(self, node: nodes.ClassDef):
+        """ Check if a class is private or protected and is not used
+            in the parent's scope.
+        """
+        parent_scope = node.parent.scope()
+        if isinstance(parent_scope, nodes.ClassDef):
+            # For nested classes, we will skip to avoid false negatives
+            return
+        references = [
+            name_obj for name_obj in parent_scope.nodes_of_class(astroid.Name) if name_obj.name == node.name
+        ]
+        if (is_attr_private(node.name) or is_attr_protected(node.name)) and not references:
+            self.add_message(
+                "unused-private-class",
+                node=node,
+                args=(node.name)
             )
 
 

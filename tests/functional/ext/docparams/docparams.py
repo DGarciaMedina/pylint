@@ -1,4 +1,5 @@
 """Fixture for testing missing documentation in docparams."""
+# pylint:disable=unused-private-function
 
 
 def _private_func1(param1):  # [missing-return-doc, missing-return-type-doc]

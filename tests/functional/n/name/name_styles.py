@@ -1,5 +1,5 @@
 """Test for the invalid-name warning."""
-# pylint: disable= useless-object-inheritance, unnecessary-pass, unnecessary-comprehension, unused-private-member
+# pylint: disable= useless-object-inheritance, unnecessary-pass, unnecessary-comprehension, unused-private-member, unused-private-function, unused-private-class
 from __future__ import print_function
 import abc
 import collections
